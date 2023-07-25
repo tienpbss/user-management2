@@ -42,12 +42,14 @@ const editInfo = async (req, res) => {
         bhxh,
         address,
     } = req.body;
+    const saltRounds = 10;
+    const hashPassword = await bcrypt.hash(password, saltRounds);
     const editQuery = 'UPDATE `user`'+
         'SET email=?, `password`=?, `firstname`=?, `lastname`=?, `dob`=?, `phone`=?, `cmnd`=?, `bhxh`=?, `address`=?'+
         'WHERE id = 3;'
     await pool.execute(editQuery, [
         email,
-        password,
+        hashPassword,
         firstname,
         lastname,
         dob,
