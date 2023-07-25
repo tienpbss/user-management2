@@ -23,7 +23,10 @@ const login = async (req, res) => {
 }
 
 const viewInfo = async (req, res) => {
-    
+    const user = req.user;
+    res.json({
+        user
+    })
 }
 
 // CREATE TABLE `user` (

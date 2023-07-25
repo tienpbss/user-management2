@@ -4,6 +4,9 @@ const pool = require('../configs/connectDB.configs')
 
 const isLogged = async (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader){
+        throw Error('Missing token');
+    }
     const jwtToken = authorizationHeader.split(' ')[1];
     const payload = jwt.verify(jwtToken, process.env.JWT_KEY);
     const userId = payload.id
