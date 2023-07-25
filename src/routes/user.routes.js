@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/login', auth.isNotLogged, userControllers.login);
 router.get('/viewInfo', auth.isLogged, userControllers.viewInfo);
+router.patch('/editInfo', auth.isLogged, userControllers.editInfo);
 
 module.exports = router;

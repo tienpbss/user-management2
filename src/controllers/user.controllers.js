@@ -29,6 +29,39 @@ const viewInfo = async (req, res) => {
     })
 }
 
+const editInfo = async (req, res) => {
+    const user = req.user;
+    const {
+        email,
+        password,
+        firstname,
+        lastname,
+        dob,
+        phone,
+        cmnd,
+        bhxh,
+        address,
+    } = req.body;
+    const editQuery = 'UPDATE `user`'+
+        'SET email=?, `password`=?, `firstname`=?, `lastname`=?, `dob`=?, `phone`=?, `cmnd`=?, `bhxh`=?, `address`=?'+
+        'WHERE id = 3;'
+    await pool.execute(editQuery, [
+        email,
+        password,
+        firstname,
+        lastname,
+        dob,
+        phone,
+        cmnd,
+        bhxh,
+        address,
+    ])
+    res.json({
+        message: "Edited info user"
+    })
+    
+}
+
 // CREATE TABLE `user` (
 // 	`id` INT NOT NULL AUTO_INCREMENT,
 // 	`manv` varchar(255) NOT NULL,
@@ -50,4 +83,5 @@ const viewInfo = async (req, res) => {
 module.exports = {
     login,
     viewInfo,
+    editInfo,
 }
