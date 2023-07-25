@@ -12,18 +12,28 @@ const isLogged = async (req, res, next) => {
         throw Error('Can not found user with this token')
     }
     const user = users[0];
+    if (user.isactivate == false){
+        throw Error('User is no longer active');
+    }
     user.roles = [];
     user.permissions = [];
-    let sql = 'select `role`.`name` as role_name, `role`.`name` as roleId '+
+    let sql = 'select `role`.`name` as role_name, `role`.`id` as roleId '+
         'from `user_role` '+
         'inner join `role` '+
         'on `user_role`.role_id = `role`.id '+
         'where user_role.user_id = ?; '
     let [rolesOfUser] = await pool.execute(sql, [userId]);
+
+    
     for (let i of rolesOfUser){
         user.roles.push(i.role_name);
+
     }
-    res.send(user)
+
+    //PENDING PHAN THEM PERMISSION VAO USER
+
+    //
+    req.user = user;
     next();
 }
 
@@ -34,6 +44,7 @@ const isNotLogged = async (req, res, next) => {
     }
     next();
 }
+
 
 
 module.exports = {

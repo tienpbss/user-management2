@@ -55,6 +55,85 @@ const getAllUsers = async (req, res) => {
     res.json({ users })
 }
 
+const getUser = async (req, res) => {
+    const userId = req.params.userId;
+    const [users] = await pool.execute('SELECT * FROM `user` WHERE id=?', [userId]);
+    if (users.length == 0) {
+        throw Error('User not found');
+    }
+    const user = users[0];
+    res.json({
+        user
+    })
+}
+
+const editUser = async (req, res) => {
+    const userId = req.params.userId;
+    const {
+        manv,
+        email,
+        password,
+        firstname,
+        lastname,
+        dob,
+        phone,
+        cmnd,
+        bhxh,
+        address,
+        isactivate,
+        roles
+    } = req.body;
+    const saltRounds = 10;
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    try{
+        await pool.query('START TRANSACTION');
+        const editQuery = "UPDATE `user` " +
+            "SET manv = ?, email= ?, `password`=?, `firstname`=?, `lastname`=?, `dob`=?, `phone`=?, `cmnd`=?, `bhxh`=?, `address`=?, `isactivate`=? "+
+            "WHERE id = ?;"
+        const [result] = await pool.execute(
+            editQuery,
+            [
+                manv,
+                email,
+                hashPassword,
+                firstname,
+                lastname,
+                dob,
+                phone,
+                cmnd,
+                bhxh,
+                address,  
+                isactivate,
+                userId
+            ]
+        )
+        await pool.execute('DELETE FROM `user_role` WHERE user_id=?;', [userId]);
+        for (let role of roles){
+            const add_user_role_sql = 'INSERT INTO `user_role`(user_id, role_id) VALUES (?, ?);';
+            await pool.execute(add_user_role_sql, [userId, role]);
+        }
+        await pool.query('COMMIT');
+        res.json({
+            message: "Edited user"
+        })
+    }
+    catch(error){
+        console.log(error);
+        await pool.query('ROLLBACK');
+        res.status(500).json({ error: 'Error edit user' })
+    }
+
+
+}
+
+const deActivateUser = async (req, res) => {
+    const userId = req.params.userId;
+    await pool.execute('UPDATE `user` SET `isactivate`=0 WHERE id=?;', [userId]);
+    res.json({
+        message: 'Deactivate user'
+    })
+}
+
 // CREATE TABLE `user` (
 // 	`id` INT NOT NULL AUTO_INCREMENT,
 // 	`manv` varchar(255) NOT NULL,
@@ -75,4 +154,7 @@ const getAllUsers = async (req, res) => {
 module.exports = {
     addUser,
     getAllUsers,
+    getUser,
+    editUser,
+    deActivateUser,
 }

@@ -21,6 +21,11 @@ const login = async (req, res) => {
         jwtToken
     })
 }
+
+const viewInfo = async (req, res) => {
+    
+}
+
 // CREATE TABLE `user` (
 // 	`id` INT NOT NULL AUTO_INCREMENT,
 // 	`manv` varchar(255) NOT NULL,
@@ -34,10 +39,12 @@ const login = async (req, res) => {
 // 	`cmnd` varchar(255),
 // 	`bhxh` varchar(255),
 // 	`address` varchar(255),
+//  `isactivate` boolean default true,
 // 	PRIMARY KEY (`id`)
 // );
 
 
 module.exports = {
-    login
+    login,
+    viewInfo,
 }
