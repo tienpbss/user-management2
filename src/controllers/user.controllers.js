@@ -60,8 +60,7 @@ const editInfo = async (req, res) => {
     ])
     res.json({
         message: "Edited info user"
-    })
-    
+    })   
 }
 
 // CREATE TABLE `user` (
