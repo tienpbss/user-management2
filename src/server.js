@@ -1,5 +1,8 @@
 require('dotenv').config();
 require('express-async-errors');
+require('./models')
+
+
 const express = require('express');
 
 const notFoundHandle = require('./middleware/notfound.middleware');
@@ -11,6 +14,7 @@ const formSubmitRoutes = require('./routes/form-submit.routes')
 
 
 const app = express()
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -24,6 +28,8 @@ app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/form', formRoutes);
 app.use('/formSubmit', formSubmitRoutes);
+
+
 
 app.use(notFoundHandle);
 app.use(errorHandler);

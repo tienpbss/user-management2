@@ -1,25 +1,63 @@
-const pool = require('../configs/connectDB.configs');
+const { DataTypes } = require('sequelize');
 
+module.exports = (sequelize) => {
+    const User = sequelize.define('User', {
+        mnv: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        avatar: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true,   
+            }
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        firstName: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        lastName: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        dob: {
+            type: DataTypes.DATEONLY,
+            allowNull: false
+        },
+        phone: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        cmnd: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        bhxh: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        address: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        activate: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
 
-class User {
-    static async findByEmail(email) {
-        try{
-            const [rows, fields] = pool.execute('SELECT * FROM user where email = ?', [email]);
-            return rows;
-        }
-        catch(error){
-            console.log(error);
-        }
-    }
+    });
 
-    static async findById(id) {
-        try{
-            const [rows, fields] = pool.execute('SELECT * FROM user where id = ?', [id]);
-            return rows
-        }
-        catch(error){
-            console.log(error);
-        }
-    }
+    return User
 
 }
+
