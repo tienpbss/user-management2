@@ -1,41 +1,23 @@
 const jwt = require('jsonwebtoken');
 
-const pool = require('../configs/connectDB.configs')
-
+const { User, Role } = require('../models')
 const isLogged = async (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
-    if (!authorizationHeader){
+    if (!authorizationHeader) {
         throw Error('Missing token');
     }
     const jwtToken = authorizationHeader.split(' ')[1];
     const payload = jwt.verify(jwtToken, process.env.JWT_KEY);
     const userId = payload.id
-    const [users, fields] = await pool.execute('SELECT * FROM `user` WHERE `id`=?', [payload.id]);
-    if (users.length === 0){
-        throw Error('Can not found user with this token')
-    }
-    const user = users[0];
-    if (user.isactivate == false){
+    const user = await User.findOne( {
+        where: {
+            id: userId
+        },
+        include: Role
+    } )
+    if (!user.activate){
         throw Error('User is no longer active');
     }
-    user.roles = [];
-    user.permissions = [];
-    let sql = 'select `role`.`name` as role_name, `role`.`id` as roleId '+
-        'from `user_role` '+
-        'inner join `role` '+
-        'on `user_role`.role_id = `role`.id '+
-        'where user_role.user_id = ?; '
-    let [rolesOfUser] = await pool.execute(sql, [userId]);
-
-    
-    for (let i of rolesOfUser){
-        user.roles.push(i.role_name);
-
-    }
-
-    //PENDING PHAN THEM PERMISSION VAO USER
-
-    //
     req.user = user;
     next();
 }

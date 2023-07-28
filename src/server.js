@@ -8,9 +8,8 @@ const express = require('express');
 const notFoundHandle = require('./middleware/notfound.middleware');
 const errorHandler = require('./middleware/errorhandler.middleware');
 const userRoutes = require('./routes/user.routes');
-const adminRoutes = require('./routes/admin.routes');
-const formRoutes = require('./routes/form.routes')
-const formSubmitRoutes = require('./routes/form-submit.routes')
+const formRoutes = require('./routes/form.routes');
+const roleRoutes = require('./routes/role.routes')
 
 
 const app = express()
@@ -24,10 +23,9 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.use('/user', userRoutes);
-app.use('/admin', adminRoutes);
-app.use('/form', formRoutes);
-app.use('/formSubmit', formSubmitRoutes);
+app.use('/users', userRoutes);
+app.use('/forms', formRoutes);
+app.use('/roles', roleRoutes);
 
 
 

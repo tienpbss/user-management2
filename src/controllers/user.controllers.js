@@ -1,22 +1,23 @@
 const jwt= require('jsonwebtoken')
-
-const pool = require('../configs/connectDB.configs')
 const bcrypt = require('bcrypt');
-const role_user = require('../utils/values/roles')
+const role_user = require('../utils/values/roles');
 
+const { sequelize, User, Role } = require('../models');
+const { saltRounds } = require('../configs/hashPW.configs');
 
 const login = async (req, res) => {
     const { email, password } = req.body;
-    const [users] = await pool.query('SELECT * FROM `user` WHERE `email`=?', [email]);
-    if (users.length === 0){
-        throw new Error('User not found');
+    const user = await User.findOne({
+        where: { email }
+    });
+    if (!user) {
+        throw Error('Not found user with that email')
     }
-    const user = users[0];
-    const checkPassword = await bcrypt.compare(password, user.password);
-    if (!checkPassword){
-        throw new Error('Wrong password');
+    const comparePassword = bcrypt.compare(password, user.password);
+    if (!comparePassword){
+        throw Error('Wrong password');
     }
-    const jwtToken = jwt.sign(user.id, process.env.JWT_KEY, )
+    const jwtToken = jwt.sign(user.id, process.env.JWT_KEY, );
     res.json({
         jwtToken
     })
@@ -34,55 +35,192 @@ const editInfo = async (req, res) => {
     const {
         email,
         password,
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         dob,
         phone,
         cmnd,
         bhxh,
         address,
     } = req.body;
-    const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
-    const editQuery = 'UPDATE `user`'+
-        'SET email=?, `password`=?, `firstname`=?, `lastname`=?, `dob`=?, `phone`=?, `cmnd`=?, `bhxh`=?, `address`=?'+
-        'WHERE id = 3;'
-    await pool.execute(editQuery, [
+    const userEdited = await User.update({
         email,
-        hashPassword,
-        firstname,
-        lastname,
+        password: hashPassword,
+        firstName,
+        lastName,
+        dob,
+        phone,
+        cmnd,
+        bhxh,
+        address, 
+    },
+    {
+        where: {
+            id: user.id
+        }
+    })
+    res.json({
+        message: "Edited info ",
+    })   
+}
+
+const getAllUsers = async (req, res) => {
+    const users = await User.findAll();
+    res.json({
+        users
+    })
+}
+
+const getUser = async (req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findByPk(userId, {
+        include: Role
+    });
+    if (!user){
+        throw Error('User not found');
+    }
+    res.json({
+        message: 'Return user',
+        user
+    })
+}
+
+const addUser = async (req, res) => {
+    const {
+        email,
+        password,
+        firstName,
+        lastName,
         dob,
         phone,
         cmnd,
         bhxh,
         address,
-    ])
-    res.json({
-        message: "Edited info user"
-    })   
+        roles
+    } = req.body;
+    if (!email || !password || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address || !roles){
+        throw Error('Missing fields')
+    }
+    // Ma nhan vien mac dinh la date.now don vi giay
+    const mnv = Math.floor(Date.now() / 1000);
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const t = await sequelize.transaction();
+    try {
+        const user = await User.create({
+            mnv,
+            email,
+            password: hashPassword,
+            firstName,
+            lastName,
+            dob,
+            phone,
+            cmnd,
+            bhxh,
+            address,
+        }); 
+        const result = await user.setRoles(roles);
+        await t.commit();
+        res.json({
+            message: 'Added user',
+            user,
+            result
+        })        
+    } catch (error) {
+        console.error(error);
+        res.json({
+            error: error.message,
+        })
+        await t.rollback();
+    }
+
 }
 
-// CREATE TABLE `user` (
-// 	`id` INT NOT NULL AUTO_INCREMENT,
-// 	`manv` varchar(255) NOT NULL,
-// 	`avatar` varchar(255),
-// 	`email` varchar(255) NOT NULL UNIQUE,
-// 	`password` varchar(255) NOT NULL,
-// 	`firstname` varchar(255),
-// 	`lastname` varchar(255),
-// 	`dob` varchar(255),
-// 	`phone` varchar(255),
-// 	`cmnd` varchar(255),
-// 	`bhxh` varchar(255),
-// 	`address` varchar(255),
-//  `isactivate` boolean default true,
-// 	PRIMARY KEY (`id`)
-// );
+const editUser = async (req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findByPk(userId);
+    if (!user){
+        throw Error('User not found');
+    }
+    const {
+        mnv,
+        email,
+        password,
+        firstName,
+        lastName,
+        dob,
+        phone,
+        cmnd,
+        bhxh,
+        address,
+    } = req.body;
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    await User.update({
+        mnv,
+        email,
+        password: hashPassword,
+        firstName,
+        lastName,
+        dob,
+        phone,
+        cmnd,
+        bhxh,
+        address, 
+    },
+    {
+        where: {
+            id: userId
+        }
+    })
+    res.json({
+        message: "Edited user"
+    })
+}
+
+const editStatusUser = async (req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findByPk(userId);
+    if (!user){
+        throw Error('User not found');
+    }
+    const { status } = req.body;
+    await User.update({
+        activate: status,
+    },
+    {
+        where: {
+            id: userId
+        }
+    })
+    res.json({
+        message: "Edited status of user"
+    })
+}
+
+const editRoleUser = async (req, res) => {
+    const userId = req.params.userId;
+    const roles = req.body.roles;
+    const user = await User.findByPk(userId);
+    if (!user){
+        throw Error('User not found');
+    }
+    const resultSet = await user.setRoles(roles);
+    res.json({
+        message: "edited role",
+        resultSet
+    })
+}
+
 
 
 module.exports = {
     login,
     viewInfo,
     editInfo,
+    getAllUsers,
+    getUser,
+    addUser,
+    editUser,
+    editStatusUser,
+    editRoleUser,
 }

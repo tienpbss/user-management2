@@ -63,6 +63,8 @@ module.exports = {
     User,
     Role,
     FormCategory,
-    Form
+    Form,
+    Task,
+    FormSubmit,
 }
 
