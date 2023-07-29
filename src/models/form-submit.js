@@ -17,7 +17,8 @@ module.exports = (sequelize, User, Form) => {
         },
         status: {
             type: DataTypes.ENUM('NEW', 'PENDING', 'APPROVAL'),
-            allowNull: false
+            allowNull: false,
+            defaultValue: 'NEW',
         }
     })
     return FormSubmit
