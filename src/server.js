@@ -9,7 +9,8 @@ const notFoundHandle = require('./middleware/notfound.middleware');
 const errorHandler = require('./middleware/errorhandler.middleware');
 const userRoutes = require('./routes/user.routes');
 const formRoutes = require('./routes/form.routes');
-const roleRoutes = require('./routes/role.routes')
+const roleRoutes = require('./routes/role.routes');
+const formSubmitRoutes = require('./routes/form-submit.routes');
 
 
 const app = express()
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 app.use('/users', userRoutes);
 app.use('/roles', roleRoutes);
 app.use('/forms', formRoutes);
+app.use('/formSubmits', formSubmitRoutes);
 
 
 

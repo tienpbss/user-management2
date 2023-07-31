@@ -4,7 +4,7 @@ const UserModel = require('./user.models');
 const RoleModel = require('./role.models');
 const FormCategoryModel = require('./form-category.models');
 const FormModel = require('./form.models');
-const FormSubmitModel = require('./form-submit');
+const FormSubmitModel = require('./form-submit.models');
 const TaskModel = require('./task.models');
 
 const sequelize = new Sequelize(
