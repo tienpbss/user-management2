@@ -158,31 +158,7 @@ const reject = async (req, res) => {
     })
 }
 
-const closeForm = async (req, res) => {
-    const { formId } = req.params;
-    const form = Form.findByPk(formId);
-    if (!form) {
-        throw Error('Form not found');
-    }
-    form.status = formStatus.CLOSED;
-    await form.save();
-    res.json({
-        message: 'closed form'
-    })
-}
 
-const openForm = async (req, res) => {
-    const { formId } = req.params;
-    const form = Form.findByPk(formId);
-    if (!form) {
-        throw Error('Form not found');
-    }
-    form.status = formStatus.OPEN;
-    await form.save();
-    res.json({
-        message: 'open form'
-    })
-}
 
 
 
@@ -194,6 +170,5 @@ module.exports = {
     submit,
     approval,
     reject,
-    closeForm,
-    openForm
+
 }

@@ -1,5 +1,7 @@
-const jwt= require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
 const role_user = require('../utils/values/roles');
 
 const { sequelize, User, Role } = require('../models');
@@ -14,10 +16,10 @@ const login = async (req, res) => {
         throw Error('Not found user with that email')
     }
     const comparePassword = bcrypt.compare(password, user.password);
-    if (!comparePassword){
+    if (!comparePassword) {
         throw Error('Wrong password');
     }
-    const jwtToken = jwt.sign(user.id, process.env.JWT_KEY, );
+    const jwtToken = jwt.sign(user.id, process.env.JWT_KEY,);
     res.json({
         jwtToken
     })
@@ -53,17 +55,51 @@ const editInfo = async (req, res) => {
         phone,
         cmnd,
         bhxh,
-        address, 
+        address,
     },
-    {
-        where: {
-            id: user.id
-        }
-    })
+        {
+            where: {
+                id: user.id
+            }
+        })
     res.json({
         message: "Edited info ",
-    })   
+    })
 }
+
+const updateAvatar = async (req, res) => {
+    const user = req.user;
+    if (user.avatar) {
+        const avatarPath = path.join(process.cwd(), user.avatar);
+        if (fs.existsSync(avatarPath)) {
+            fs.unlinkSync(avatarPath);
+        }
+
+    }
+    const avatar = req.file ? req.file.path : null;
+    user.avatar = avatar;
+    await user.save();
+    res.json({
+        message: 'upload avatar success'
+    })
+}
+
+const getAvatar = async (req, res) => {
+    const user = req.user;
+    if (!user.avatar) {
+        return res.send(null)
+    }
+    const avatarPath = path.join(process.cwd(), user.avatar);
+    if (!fs.existsSync(avatarPath)) {
+        return res.send(null)
+    }
+
+    res.sendFile(avatarPath);
+
+
+}
+
+
 
 const getAllUsers = async (req, res) => {
     const users = await User.findAll();
@@ -77,7 +113,7 @@ const getUser = async (req, res) => {
     const user = await User.findByPk(userId, {
         include: Role
     });
-    if (!user){
+    if (!user) {
         throw Error('User not found');
     }
     res.json({
@@ -99,7 +135,7 @@ const addUser = async (req, res) => {
         address,
         roles
     } = req.body;
-    if (!email || !password || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address || !roles){
+    if (!email || !password || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address || !roles) {
         throw Error('Missing fields')
     }
     // Ma nhan vien mac dinh la date.now don vi giay
@@ -118,14 +154,14 @@ const addUser = async (req, res) => {
             cmnd,
             bhxh,
             address,
-        }); 
+        });
         const result = await user.setRoles(roles);
         await t.commit();
         res.json({
             message: 'Added user',
             user,
             result
-        })        
+        })
     } catch (error) {
         console.error(error);
         res.json({
@@ -139,7 +175,7 @@ const addUser = async (req, res) => {
 const editUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findByPk(userId);
-    if (!user){
+    if (!user) {
         throw Error('User not found');
     }
     const {
@@ -165,13 +201,13 @@ const editUser = async (req, res) => {
         phone,
         cmnd,
         bhxh,
-        address, 
+        address,
     },
-    {
-        where: {
-            id: userId
-        }
-    })
+        {
+            where: {
+                id: userId
+            }
+        })
     res.json({
         message: "Edited user"
     })
@@ -180,18 +216,18 @@ const editUser = async (req, res) => {
 const editStatusUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findByPk(userId);
-    if (!user){
+    if (!user) {
         throw Error('User not found');
     }
     const { status } = req.body;
     await User.update({
         activate: status,
     },
-    {
-        where: {
-            id: userId
-        }
-    })
+        {
+            where: {
+                id: userId
+            }
+        })
     res.json({
         message: "Edited status of user"
     })
@@ -201,7 +237,7 @@ const editRoleUser = async (req, res) => {
     const userId = req.params.userId;
     const roles = req.body.roles;
     const user = await User.findByPk(userId);
-    if (!user){
+    if (!user) {
         throw Error('User not found');
     }
     const resultSet = await user.setRoles(roles);
@@ -217,6 +253,8 @@ module.exports = {
     login,
     viewInfo,
     editInfo,
+    updateAvatar,
+    getAvatar,
     getAllUsers,
     getUser,
     addUser,
