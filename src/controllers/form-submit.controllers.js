@@ -1,5 +1,5 @@
 const { Form, Task, User, FormSubmit, FormCategory, sequelize } = require('../models');
-const formSubmitStatus = require('../utils/values/form-submit-status');
+const { formSubmitStatus, formStatus, roles } = require('../utils/values');
 const { Op } = require("sequelize");
 
 const viewAllForms = async (req, res) => {
@@ -103,7 +103,7 @@ const getFormSubmit = async (req, res) => {
 
 const getAllFormSubmits = async (req, res) => {
     const { status } = req.query;
-    if (status != formSubmitStatus.PENDING && status != formSubmitStatus.APPROVAL){
+    if (status != formSubmitStatus.PENDING && status != formSubmitStatus.APPROVAL) {
         throw Error('status not allow')
     }
     let filter = {
@@ -158,6 +158,32 @@ const reject = async (req, res) => {
     })
 }
 
+const closeForm = async (req, res) => {
+    const { formId } = req.params;
+    const form = Form.findByPk(formId);
+    if (!form) {
+        throw Error('Form not found');
+    }
+    form.status = formStatus.CLOSED;
+    await form.save();
+    res.json({
+        message: 'closed form'
+    })
+}
+
+const openForm = async (req, res) => {
+    const { formId } = req.params;
+    const form = Form.findByPk(formId);
+    if (!form) {
+        throw Error('Form not found');
+    }
+    form.status = formStatus.OPEN;
+    await form.save();
+    res.json({
+        message: 'open form'
+    })
+}
+
 
 
 module.exports = {
@@ -167,5 +193,7 @@ module.exports = {
     getAllFormSubmits,
     submit,
     approval,
-    reject
+    reject,
+    closeForm,
+    openForm
 }
