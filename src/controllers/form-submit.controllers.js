@@ -5,8 +5,6 @@ const { Op } = require("sequelize");
 const viewAllForms = async (req, res) => {
     const user = req.user;
     const { status } = req.query;
-    console.log(req.query)
-    console.log(status);
     const formSubmits = await user.getForms({
         include: [{ model: FormCategory }]
     });
@@ -157,10 +155,6 @@ const reject = async (req, res) => {
         message: 'reject form',
     })
 }
-
-
-
-
 
 module.exports = {
     viewAllForms,

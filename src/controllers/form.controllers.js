@@ -1,5 +1,6 @@
 
 const { Form, User, FormCategory, sequelize } = require('../models');
+const sendMail = require('../utils/send-mail');
 
 const createForm = async (req, res) => {
     const {
@@ -67,10 +68,14 @@ const setAllUsers = async (req, res) => {
         where: {
             activate: true,
         },
-        attributes: ['id']
+        attributes: ['id', 'email']
     });
     const allUserIds = allUsers.map(e => e.id);
     const result = await form.setUsers(allUserIds);
+
+    let emails = allUsers.map(e => e.email);
+    const category = await FormCategory.findByPk(form.FormCategoryId);
+    await sendMail(category.name, emails);
     res.json({
         result,
         message: 'Set this form for all users',
@@ -80,14 +85,19 @@ const setAllUsers = async (req, res) => {
 const setUsers = async (req, res) => {
     const { userIds } = req.body;
     const formId = req.params.formId;
+    const emails = [];
     for (let i of userIds){
-        const user = User.findByPk(i);
+        const user = await User.findByPk(i);
         if (!user){
             throw Error(`Not found user with id: ${i}`);
         }
+        emails.push(user.email);
     }
     const form = await Form.findByPk(formId);
     const result = await form.setUsers(userIds);
+    const category = await FormCategory.findByPk(form.FormCategoryId);
+    await sendMail(category.name, emails);
+    
     res.json({
         result,
         message: 'Set this form for specific users',
