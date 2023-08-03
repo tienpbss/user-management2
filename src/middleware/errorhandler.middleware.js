@@ -1,7 +1,8 @@
 const errorHandler = (err, req, res, next) => {
     console.error(err);
-    res.json({
-        error: err.message,
+    res.status(500).json({
+        err: err.message,
+        error: 'An error occurred'
     })
 }
 

@@ -13,13 +13,17 @@ const login = async (req, res) => {
         where: { email }
     });
     if (!user) {
-        throw Error('Not found user with that email')
+        return res.status(404).json({
+            error: 'User not found'
+        })
     }
-    const comparePassword = bcrypt.compare(password, user.password);
-    if (!comparePassword) {
-        throw Error('Wrong password');
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        return res.status(401).json({
+            error: 'Wrong password'
+        })
     }
-    const jwtToken = jwt.sign(user.id, process.env.JWT_KEY,);
+    const jwtToken = jwt.sign({ id: user.id }, process.env.JWT_KEY,);
     res.json({
         jwtToken
     })
@@ -36,7 +40,6 @@ const editInfo = async (req, res) => {
     const user = req.user;
     const {
         email,
-        password,
         firstName,
         lastName,
         dob,
@@ -45,13 +48,11 @@ const editInfo = async (req, res) => {
         bhxh,
         address,
     } = req.body;
-    const hashPassword = await bcrypt.hash(password, saltRounds);
     const userEdited = await User.update({
         email,
-        password: hashPassword,
         firstName,
         lastName,
-        dob,
+        dob: new Date(dob),
         phone,
         cmnd,
         bhxh,
@@ -63,8 +64,20 @@ const editInfo = async (req, res) => {
             }
         })
     res.json({
-        message: "Edited info ",
+        message: 'Info edited successfully',
     })
+}
+
+const editPassword = async (req, res) => {
+    const user = req.user;
+    const { password } = req.body;
+    if (!password) {
+        return res.status(400).json({ error: 'Missing password' });
+    }
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    user.password = hashPassword;
+    await user.save();
+    res.json({ message: 'Password edited successfully' })
 }
 
 const updateAvatar = async (req, res) => {
@@ -114,12 +127,12 @@ const getUser = async (req, res) => {
         include: Role
     });
     if (!user) {
-        throw Error('User not found');
+        return res.status(404).json({ error: 'User not found' });
     }
     res.json({
-        message: 'Return user',
+        message: 'User returned successfully',
         user
-    })
+    });
 }
 
 const addUser = async (req, res) => {
@@ -136,7 +149,7 @@ const addUser = async (req, res) => {
         roles
     } = req.body;
     if (!email || !password || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address || !roles) {
-        throw Error('Missing fields')
+        return res.status(400).json({ error: 'Missing fields' })
     }
     // Ma nhan vien mac dinh la date.now don vi giay
     const mnv = Math.floor(Date.now() / 1000);
@@ -149,7 +162,7 @@ const addUser = async (req, res) => {
             password: hashPassword,
             firstName,
             lastName,
-            dob,
+            dob: new Date(dob),
             phone,
             cmnd,
             bhxh,
@@ -157,17 +170,15 @@ const addUser = async (req, res) => {
         });
         const result = await user.setRoles(roles);
         await t.commit();
-        res.json({
-            message: 'Added user',
+        return res.status(201).json({
+            message: 'User added successfully',
             user,
             result
         })
     } catch (error) {
-        console.error(error);
-        res.json({
-            error: error.message,
-        })
+        console.error('Add user error:', error);
         await t.rollback();
+        return res.status(500).json({ error: 'An error occurred while adding user' });
     }
 
 }
@@ -176,12 +187,11 @@ const editUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findByPk(userId);
     if (!user) {
-        throw Error('User not found');
+        return res.status(404).json({ error: 'User not found' })
     }
     const {
         mnv,
         email,
-        password,
         firstName,
         lastName,
         dob,
@@ -190,14 +200,15 @@ const editUser = async (req, res) => {
         bhxh,
         address,
     } = req.body;
-    const hashPassword = await bcrypt.hash(password, saltRounds);
+    if (!mnv || !email || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address) {
+        return res.status(400).json({ error: 'Missing fields' })
+    }
     await User.update({
         mnv,
         email,
-        password: hashPassword,
         firstName,
         lastName,
-        dob,
+        dob: new Date(dob),
         phone,
         cmnd,
         bhxh,
@@ -209,17 +220,33 @@ const editUser = async (req, res) => {
             }
         })
     res.json({
-        message: "Edited user"
+        message: 'User edited successfully'
     })
+}
+
+const editPasswordUser = async (req, res) => {
+    const userId = req.params.userId;
+    const { password } = req.body;
+    if (!password) {
+        return res.status(400).json({ error: 'Missing password' });
+    }
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const user = await User.findByPk(userId);
+    user.password - hashPassword;
+    await user.save();
+    res.json({ message: 'Password edited successfully' })
 }
 
 const editStatusUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findByPk(userId);
     if (!user) {
-        throw Error('User not found');
+        return res.status(404).json({ error: 'User not found' });
     }
     const { status } = req.body;
+    if (!status) {
+        return res.status(400).json({ error: 'Missing status' });
+    }
     await User.update({
         activate: status,
     },
@@ -229,7 +256,7 @@ const editStatusUser = async (req, res) => {
             }
         })
     res.json({
-        message: "Edited status of user"
+        message: "User status edited successfully"
     })
 }
 
@@ -238,11 +265,11 @@ const editRoleUser = async (req, res) => {
     const roles = req.body.roles;
     const user = await User.findByPk(userId);
     if (!user) {
-        throw Error('User not found');
+        return res.status(404).json({ Error: 'User not found' });
     }
     const resultSet = await user.setRoles(roles);
     res.json({
-        message: "edited role",
+        message: "User roles edited successfully",
         resultSet
     })
 }
@@ -253,12 +280,14 @@ module.exports = {
     login,
     viewInfo,
     editInfo,
+    editPassword,
     updateAvatar,
     getAvatar,
     getAllUsers,
     getUser,
     addUser,
     editUser,
+    editPasswordUser,
     editStatusUser,
     editRoleUser,
 }

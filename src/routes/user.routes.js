@@ -26,6 +26,7 @@ const upload = multer({ storage, fileFilter });
 router.post('/login', auth.isNotLogged, userControllers.login);
 router.get('/viewInfo', auth.isLogged, userControllers.viewInfo);
 router.patch('/editInfo', auth.isLogged, userControllers.editInfo);
+router.patch('/editPassword', auth.isLogged, userControllers.editPassword);
 router.patch('/updateAvatar', auth.isLogged, upload.single('avatar'), userControllers.updateAvatar);
 router.get('/getAvatar', auth.isLogged, userControllers.getAvatar);
 
@@ -34,6 +35,7 @@ router.get('/getUser/:userId', auth.isLogged, userControllers.getUser);
 router.post('/addUser', userControllers.addUser);
 // router.post('/addUser', auth.isLogged, adminControllers.addUser);
 router.patch('/editUser/:userId', auth.isLogged, userControllers.editUser);
+router.patch('/editPasswordUser/:userId', auth.isLogged, userControllers.editPasswordUser);
 router.patch('/editStatusUser/:userId', auth.isLogged, userControllers.editStatusUser);
 router.post('/editRoleUser/:userId', auth.isLogged, userControllers.editRoleUser);
 

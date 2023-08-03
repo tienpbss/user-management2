@@ -1,5 +1,5 @@
 const notFoundHandle = (req, res) => {
-    res.json({
+    res.status(404).json({
             message: "Router does not exist"
         }
     )
