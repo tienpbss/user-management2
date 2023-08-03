@@ -101,8 +101,8 @@ const getFormSubmit = async (req, res) => {
 
 const getAllFormSubmits = async (req, res) => {
     const { status } = req.query;
-    if (status != formSubmitStatus.PENDING && status != formSubmitStatus.APPROVAL) {
-        throw Error('status not allow')
+    if (status && status != formSubmitStatus.PENDING && status != formSubmitStatus.APPROVAL) {
+        res.status(400).json({ error: 'Status not allow' })
     }
     let filter = {
         status: { [Op.or]: [formSubmitStatus.PENDING, formSubmitStatus.APPROVAL] },

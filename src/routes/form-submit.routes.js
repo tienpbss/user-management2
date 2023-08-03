@@ -13,6 +13,8 @@ router.get('/getFormSubmit/:formId/:userId', auth.isLogged, formSubmitController
 router.get('/getAllFormSubmits', auth.isLogged, formSubmitControllers.getAllFormSubmits);
 router.post('/approval', auth.isLogged, formSubmitControllers.approval);
 router.post('/reject', auth.isLogged, formSubmitControllers.reject);
+router.post('/reports', auth.isLogged, formSubmitControllers.reject);
+
 
 
 module.exports = router;

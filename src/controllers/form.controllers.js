@@ -10,6 +10,10 @@ const createForm = async (req, res) => {
         name
     } = req.body;
 
+    if (!categoryId || !dueDate || !description || !name){
+        return res.status(400).json({ error: 'Missing fields' })
+    }
+
     const formCategory = await FormCategory.findByPk(categoryId);
     const form = await formCategory.createForm({
         name,
@@ -17,9 +21,9 @@ const createForm = async (req, res) => {
         dueDate
     });
 
-    res.json({
+    res.status(201).json({
         form,
-        message: 'created new form'
+        message: 'Created a new form'
     })
 }
 
@@ -31,6 +35,9 @@ const editInfoForm = async (req, res) => {
         name
     } = req.body;
     const form = await Form.findByPk(formId);
+    if (!form) {
+        return res.status(404).json({ error: 'Form not found' });
+    }
     form.set({
         name,
         description,
@@ -39,7 +46,7 @@ const editInfoForm = async (req, res) => {
     await form.save();
     res.json({
         form,
-        message: 'edited info of form'
+        message: 'Edited form information'
     })
 }
 
@@ -54,7 +61,7 @@ const getForm = async (req, res) => {
     const formId = req.params.formId;
     const form = await Form.findByPk(formId);
     if (!form) {
-        throw Error('Form not found');
+        return res.status(404).json({ error: 'Form not found' });
     }
     res.json({
         form
@@ -64,6 +71,9 @@ const getForm = async (req, res) => {
 const setAllUsers = async (req, res) => {
     const formId = req.params.formId;
     const form = await Form.findByPk(formId);
+    if (!form) {
+        return res.status(404).json({ error: 'Form not found' });
+    }
     const allUsers = await User.findAll({
         where: {
             activate: true,
@@ -89,11 +99,14 @@ const setUsers = async (req, res) => {
     for (let i of userIds){
         const user = await User.findByPk(i);
         if (!user){
-            throw Error(`Not found user with id: ${i}`);
+            res.status(404).json({ error: 'User not found' })
         }
         emails.push(user.email);
     }
     const form = await Form.findByPk(formId);
+    if (!form) {
+        return res.status(404).json({ error: 'Form not found' });
+    }
     const result = await form.setUsers(userIds);
     const category = await FormCategory.findByPk(form.FormCategoryId);
     await sendMail(category.name, emails);
@@ -107,6 +120,9 @@ const setUsers = async (req, res) => {
 const getUserOfForm = async (req, res) => {
     const formId = req.params.formId;
     const form = await Form.findByPk(formId);
+    if (!form) {
+        return res.status(404).json({ error: 'Form not found' });
+    }
     const users = await form.getUsers();
     res.json({
         users,
@@ -117,6 +133,9 @@ const getUserOfForm = async (req, res) => {
 const deleteForm = async (req, res) => {
     const formId = req.params.formId;
     const form = await Form.findByPk(formId);
+    if (!form) {
+        return res.status(404).json({ error: 'Form not found' });
+    }
     const formDelete = await Form.destroy({
         where: {
           id: formId
@@ -132,7 +151,7 @@ const closeForm = async (req, res) => {
     const { formId } = req.params;
     const form = Form.findByPk(formId);
     if (!form) {
-        throw Error('Form not found');
+        return res.status(404).json({ error: 'Form not found' });
     }
     form.status = formStatus.CLOSED;
     await form.save();
@@ -145,7 +164,7 @@ const openForm = async (req, res) => {
     const { formId } = req.params;
     const form = Form.findByPk(formId);
     if (!form) {
-        throw Error('Form not found');
+        return res.status(404).json({ error: 'Form not found' });
     }
     form.status = formStatus.OPEN;
     await form.save();

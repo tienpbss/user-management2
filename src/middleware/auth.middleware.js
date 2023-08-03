@@ -4,7 +4,7 @@ const { User, Role } = require('../models')
 const isLogged = async (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) {
-        throw Error('Missing token');
+        return res.status(401).json({ error: 'Missing token' });
     }
     const jwtToken = authorizationHeader.split(' ')[1];
     const payload = jwt.verify(jwtToken, process.env.JWT_KEY);
@@ -15,8 +15,8 @@ const isLogged = async (req, res, next) => {
         },
         include: Role
     } )
-    if (!user.activate){
-        throw Error('User is no longer active');
+    if (!user || !user.activate) {
+        return res.status(401).json({ error: 'User is not active or not found' });
     }
     req.user = user;
     next();
@@ -25,7 +25,7 @@ const isLogged = async (req, res, next) => {
 const isNotLogged = async (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
     if (authorizationHeader) {
-        throw new Error('You are logged');
+        return res.status(403).json({ error: 'You are already logged in' });
     }
     next();
 }
