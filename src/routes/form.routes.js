@@ -14,6 +14,6 @@ router.get('/getUserOfForm/:formId', auth.isLogged, formControllers.getUserOfFor
 router.delete('/deleteForm/:formId', auth.isLogged, formControllers.deleteForm);
 router.post('/closeForm/:formId', auth.isLogged, formControllers.closeForm);
 router.post('/openForm/:formId', auth.isLogged, formControllers.openForm);
-
+router.post('/report', auth.isLogged, formControllers.report);
 
 module.exports = router;
