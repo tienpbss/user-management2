@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { roles } = require('../utils/values')
 
 const { User, Role } = require('../models')
 const isLogged = async (req, res, next) => {
@@ -30,9 +31,21 @@ const isNotLogged = async (req, res, next) => {
     next();
 }
 
-
+const checkRole = (...roleRequire) => {
+    return (req, res, next) => {
+        const user = req.user;
+        const roleUser = user.Roles.map(e => e.name);
+        for (let role of roleRequire){
+            if (roleUser.includes(role)){
+                return next();
+            }
+        }
+        res.json({ error: 'Access denied'})
+    }
+}
 
 module.exports = {
     isLogged,
-    isNotLogged
+    isNotLogged,
+    checkRole
 }
