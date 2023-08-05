@@ -31,6 +31,7 @@ router.patch('/editPassword', auth.isLogged, userControllers.editPassword);
 router.patch('/updateAvatar', auth.isLogged, upload.single('avatar'), userControllers.updateAvatar);
 router.get('/getAvatar', auth.isLogged, userControllers.getAvatar);
 
+router.get('/getAvatarUser/:userId', auth.isLogged, userControllers.getAvatarUser);
 router.get('/getAllUsers', auth.isLogged, userControllers.getAllUsers);
 router.get('/getUser/:userId', auth.isLogged, userControllers.getUser);
 router.post('/addUser', userControllers.addUser);

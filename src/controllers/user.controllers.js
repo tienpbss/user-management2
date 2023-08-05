@@ -112,7 +112,23 @@ const getAvatar = async (req, res) => {
 
 }
 
+const getAvatarUser = async (req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findByPk(userId, {
+        attributes: ['avatar']
+    })
+    if (!user.avatar) {
+        return res.status(404).json({ error: "Avatar not found" });
+    }
+    const avatarPath = path.join(process.cwd(), user.avatar);
+    if (!fs.existsSync(avatarPath)) {
+        return res.status(404).json({ error: "Avatar not found" });
+    }
 
+    res.sendFile(avatarPath);
+
+
+}
 
 const getAllUsers = async (req, res) => {
     const users = await User.findAll();
@@ -283,6 +299,7 @@ module.exports = {
     editPassword,
     updateAvatar,
     getAvatar,
+    getAvatarUser,
     getAllUsers,
     getUser,
     addUser,
