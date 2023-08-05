@@ -1,6 +1,7 @@
 
-const { Form, User, FormCategory, sequelize } = require('../models');
+const { Form, User, FormCategory, sequelize, FormSubmit } = require('../models');
 const sendMail = require('../utils/send-mail');
+const { formCategory, formSubmitStatus } = require('../utils/values');
 
 const createForm = async (req, res) => {
     const {
@@ -10,7 +11,7 @@ const createForm = async (req, res) => {
         name
     } = req.body;
 
-    if (!categoryId || !dueDate || !description || !name){
+    if (!categoryId || !dueDate || !description || !name) {
         return res.status(400).json({ error: 'Missing fields' })
     }
 
@@ -96,9 +97,9 @@ const setUsers = async (req, res) => {
     const { userIds } = req.body;
     const formId = req.params.formId;
     const emails = [];
-    for (let i of userIds){
+    for (let i of userIds) {
         const user = await User.findByPk(i);
-        if (!user){
+        if (!user) {
             res.status(404).json({ error: 'User not found' })
         }
         emails.push(user.email);
@@ -110,7 +111,7 @@ const setUsers = async (req, res) => {
     const result = await form.setUsers(userIds);
     const category = await FormCategory.findByPk(form.FormCategoryId);
     await sendMail(category.name, emails);
-    
+
     res.json({
         result,
         message: 'Set this form for specific users',
@@ -138,9 +139,9 @@ const deleteForm = async (req, res) => {
     }
     const formDelete = await Form.destroy({
         where: {
-          id: formId
+            id: formId
         }
-      });
+    });
     res.json({
         formDelete,
         message: 'Deleted 1 form'
@@ -173,6 +174,31 @@ const openForm = async (req, res) => {
     })
 }
 
+const report = async (req, res) => {
+    const formId = req.params.formId;
+    const status = req.query.status;
+
+    if (!Object.keys(formSubmitStatus).includes(status)){
+        res.status(400).json({ error: 'Status not valid' });
+    }
+
+    const form = await Form.findByPk(formId, {
+        include: [
+            {
+                model: User,
+                attributes: ['id', 'firstName', 'lastName'],
+                through: {
+                    where: {
+                        status
+                    }
+                }
+            }
+            
+        ]
+    })
+    res.json({ form });
+}
+
 module.exports = {
     createForm,
     editInfoForm,
@@ -183,7 +209,8 @@ module.exports = {
     getUserOfForm,
     deleteForm,
     closeForm,
-    openForm
+    openForm,
+    report
 }
 
 

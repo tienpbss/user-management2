@@ -3,6 +3,7 @@ const multer = require('multer');
 const userControllers = require('../controllers/user.controllers');
 const auth = require('../middleware/auth.middleware');
 const router = express.Router();
+const { roles } = require('../utils/values')
 
 // Set up multer for handling file uploads (avatar)
 const storage = multer.diskStorage({
