@@ -40,7 +40,7 @@ const checkRole = (...roleRequire) => {
                 return next();
             }
         }
-        res.json({ error: 'Access denied'})
+        res.status(403).json({ error: 'Access denied'})
     }
 }
 

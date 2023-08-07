@@ -1,6 +1,6 @@
 
 const { Form, User, FormCategory, sequelize, FormSubmit } = require('../models');
-const sendMail = require('../utils/send-mail');
+const { sendEmail } = require('../utils/functions');
 const { formCategory, formSubmitStatus } = require('../utils/values');
 
 const createForm = async (req, res) => {
@@ -86,7 +86,7 @@ const setAllUsers = async (req, res) => {
 
     let emails = allUsers.map(e => e.email);
     const category = await FormCategory.findByPk(form.FormCategoryId);
-    await sendMail(category.name, emails);
+    await sendEmail(category.name, emails);
     res.json({
         result,
         message: 'Set this form for all users',
@@ -110,7 +110,7 @@ const setUsers = async (req, res) => {
     }
     const result = await form.setUsers(userIds);
     const category = await FormCategory.findByPk(form.FormCategoryId);
-    await sendMail(category.name, emails);
+    await sendEmail(category.name, emails);
 
     res.json({
         result,
@@ -178,7 +178,7 @@ const report = async (req, res) => {
     const formId = req.params.formId;
     const status = req.query.status;
 
-    if (!Object.keys(formSubmitStatus).includes(status)){
+    if (!Object.keys(formSubmitStatus).includes(status)) {
         res.status(400).json({ error: 'Status not valid' });
     }
 
@@ -193,7 +193,7 @@ const report = async (req, res) => {
                     }
                 }
             }
-            
+
         ]
     })
     res.json({ form });
