@@ -2,10 +2,12 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
-const role_user = require('../utils/values/roles');
 
+const role_user = require('../utils/values/roles');
+const { checkEmailExist } = require('../utils/functions')
 const { sequelize, User, Role } = require('../models');
 const { saltRounds } = require('../configs/hashPW.configs');
+const { Op } = require('sequelize');
 
 const login = async (req, res) => {
     const { email, password } = req.body;
@@ -48,7 +50,13 @@ const editInfo = async (req, res) => {
         bhxh,
         address,
     } = req.body;
-    const userEdited = await User.update({
+
+    const emailExists = await checkEmailExist(email, user.id)
+    if (emailExists){
+        return res.status(400).json({ error: 'Email already exists'});
+    }
+
+    user.set({
         email,
         firstName,
         lastName,
@@ -57,12 +65,8 @@ const editInfo = async (req, res) => {
         cmnd,
         bhxh,
         address,
-    },
-        {
-            where: {
-                id: user.id
-            }
-        })
+    })
+    await user.save();
     res.json({
         message: 'Info edited successfully',
     })
@@ -108,8 +112,6 @@ const getAvatar = async (req, res) => {
     }
 
     res.sendFile(avatarPath);
-
-
 }
 
 const getAvatarUser = async (req, res) => {
@@ -167,6 +169,12 @@ const addUser = async (req, res) => {
     if (!email || !password || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address || !roles) {
         return res.status(400).json({ error: 'Missing fields' })
     }
+
+    const emailExist = await checkEmailExist(email);
+    if (emailExist){
+        return res.status(400).json({ error: 'Email already exists'});
+    }
+
     // Ma nhan vien mac dinh la date.now don vi giay
     const mnv = Math.floor(Date.now() / 1000);
     const hashPassword = await bcrypt.hash(password, saltRounds);
@@ -219,6 +227,12 @@ const editUser = async (req, res) => {
     if (!mnv || !email || !firstName || !lastName || !dob || !phone || !cmnd || !bhxh || !address) {
         return res.status(400).json({ error: 'Missing fields' })
     }
+
+    const emailExists = await checkEmailExist(email, userId);
+    if (emailExists){
+        return res.status(400).json({ error: 'Email already exists'});
+    }
+
     await User.update({
         mnv,
         email,
