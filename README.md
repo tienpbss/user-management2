@@ -16,8 +16,8 @@ MYSQL_DATABASE=YOUR_MYSQL_DATABASE
 
 EMAIL=YOUR_GMAIL
 MAIL_PASSWORD= generatedPassword for application in gmail 
-[Click here to view the guide](https://miracleio.me/snippets/use-gmail-with-nodemailer)
 ```
+[Click here to view the guide](https://miracleio.me/snippets/use-gmail-with-nodemailer)
 ## Installation
 
 ```bash
@@ -33,5 +33,5 @@ $ npm install
 $ npm run dev
 ```
 ## Database
-
+Create diagram on erd.dbdesigner.net don't have uuid type => use integer instead
 ![img of database](user-management_database.png)
