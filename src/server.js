@@ -11,7 +11,7 @@ const userRoutes = require('./routes/user.routes');
 const formRoutes = require('./routes/form.routes');
 const roleRoutes = require('./routes/role.routes');
 const formSubmitRoutes = require('./routes/form-submit.routes');
-
+const permissionRoutes = require('./routes/permission.routes');
 
 const app = express()
 
@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
 
 app.use('/users', userRoutes);
 app.use('/roles', roleRoutes);
+app.use('/permissions', permissionRoutes);
 app.use('/forms', formRoutes);
 app.use('/formSubmits', formSubmitRoutes);
 

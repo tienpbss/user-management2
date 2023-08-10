@@ -1,22 +1,39 @@
 const express = require('express');
-const formControllers = require('../controllers/form.controllers');
 const auth = require('../middleware/auth.middleware');
 const router = express.Router();
-const { roles } = require('../utils/values');;
-const { ADMIN, DIRECTOR, HR, MANAGER, EMPLOYEE } = roles
+const { permissions } = require('../utils/values');;
+const {
+    CREATE_FORM,
+    UPDATE_FORM,
+    READ_FORM,
+    DELETE_FORM
+} = permissions
 
+const {
+    createForm,
+    editInfoForm,
+    getAllForms,
+    getForm,
+    setAllUsers,
+    setUsers,
+    getUserOfForm,
+    deleteForm,
+    closeForm,
+    openForm,
+    report
+} = require('../controllers/form.controllers');
 
-router.post('/createForm', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.createForm);
-router.patch('/editInfoForm/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.editInfoForm);
-router.get('/getAllForms', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.getAllForms);
-router.get('/getForm/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.getForm);
-router.post('/setAllUsers/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.setAllUsers);
-router.post('/setUsers/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.setUsers);
-router.get('/getUserOfForm/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.getUserOfForm);
-router.delete('/deleteForm/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.deleteForm);
-router.post('/closeForm/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.closeForm);
-router.post('/openForm/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.openForm);
-router.get('/report/:formId', auth.isLogged, auth.checkRole(ADMIN, DIRECTOR, HR, MANAGER), formControllers.report);
+router.post('/createForm', auth.isLogged, auth.checkPermission(CREATE_FORM), createForm);
+router.patch('/editInfoForm/:formId', auth.isLogged, auth.checkPermission(UPDATE_FORM), editInfoForm);
+router.get('/getAllForms', auth.isLogged, auth.checkPermission(READ_FORM), getAllForms);
+router.get('/getForm/:formId', auth.isLogged, auth.checkPermission(READ_FORM), getForm);
+router.post('/setAllUsers/:formId', auth.isLogged, auth.checkPermission(UPDATE_FORM), setAllUsers);
+router.post('/setUsers/:formId', auth.isLogged, auth.checkPermission(UPDATE_FORM), setUsers);
+router.get('/getUserOfForm/:formId', auth.isLogged, auth.checkPermission(READ_FORM), getUserOfForm);
+router.delete('/deleteForm/:formId', auth.isLogged, auth.checkPermission(DELETE_FORM), deleteForm);
+router.post('/closeForm/:formId', auth.isLogged, auth.checkPermission(UPDATE_FORM), closeForm);
+router.post('/openForm/:formId', auth.isLogged, auth.checkPermission(UPDATE_FORM), openForm);
+router.get('/report/:formId', auth.isLogged, auth.checkPermission(CREATE_FORM), report);
 
 //co the cai thien code nay bang cach su dung app.user('forms') o server. xem lai cai nay
 

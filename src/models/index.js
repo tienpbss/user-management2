@@ -71,5 +71,6 @@ module.exports = {
     Form,
     Task,
     FormSubmit,
+    Permission
 }
 
