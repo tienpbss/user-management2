@@ -14,7 +14,7 @@ MYSQL_USER=YOUR_MYSQL_USER
 MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
 MYSQL_DATABASE=YOUR_MYSQL_DATABASE
 
-EMAIL=YOUR_EMAIL_ADDRESS
+EMAIL=YOUR_GMAIL
 MAIL_PASSWORD= generatedPassword for application in gmail [see](https://miracleio.me/snippets/use-gmail-with-nodemailer)
 ```
 ## Installation
@@ -31,3 +31,6 @@ $ npm install
 # In local development
 $ npm run dev
 ```
+## Database
+
+![img of database](user-management_database.png)
