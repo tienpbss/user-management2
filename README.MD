@@ -5,6 +5,18 @@
 - express ^4.18.2
 - sequelize ^6.32.1
 
+# Set up .env file
+```
+PORT=3000
+JWT_KEY=YOUR_SECRET_KEY
+MYSQL_HOST=localhost
+MYSQL_USER=YOUR_MYSQL_USER
+MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
+MYSQL_DATABASE=YOUR_MYSQL_DATABASE
+
+EMAIL=YOUR_EMAIL_ADDRESS
+MAIL_PASSWORD= generatedPassword for application in gmail [see](https://miracleio.me/snippets/use-gmail-with-nodemailer)
+```
 ## Installation
 
 ```bash
