@@ -15,9 +15,8 @@ MYSQL_PASSWORD=YOUR_MYSQL_PASSWORD
 MYSQL_DATABASE=YOUR_MYSQL_DATABASE
 
 EMAIL=YOUR_GMAIL
-MAIL_PASSWORD= generatedPassword for application in gmail 
+MAIL_PASSWORD= app password create by gmail
 ```
-[Click here to view the guide](https://miracleio.me/snippets/use-gmail-with-nodemailer)
 ## Installation
 
 ```bash
