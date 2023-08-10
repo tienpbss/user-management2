@@ -5,7 +5,6 @@ module.exports = (sequelize, User, Form) => {
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
-            autoIncrement: true,
             allowNull: false
         }, 
         user_comment: {

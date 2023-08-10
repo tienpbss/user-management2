@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 
 const UserModel = require('./user.models');
 const RoleModel = require('./role.models');
+const PermissionModel = require('./permission.models');
 const FormCategoryModel = require('./form-category.models');
 const FormModel = require('./form.models');
 const FormSubmitModel = require('./form-submit.models');
@@ -27,6 +28,7 @@ sequelize.authenticate().then(() => {
 //model
 const User = UserModel(sequelize);
 const Role = RoleModel(sequelize);
+const Permission = PermissionModel(sequelize);
 const Form = FormModel(sequelize);
 const FormCategory = FormCategoryModel(sequelize);
 const Task = TaskModel(sequelize);
@@ -42,6 +44,9 @@ Task.belongsTo(FormSubmit);
 //m - n
 User.belongsToMany(Role, { through: 'UserRoles' });
 Role.belongsToMany(User, { through: 'UserRoles' });
+
+Role.belongsToMany(Permission, { through: 'RolePermissions' });
+Permission.belongsToMany(Role, { through: 'RolePermissions' });
 
 User.belongsToMany(Form, { through: FormSubmit });
 Form.belongsToMany(User, { through: FormSubmit });
