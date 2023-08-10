@@ -59,6 +59,9 @@ const submit = async (req, res) => {
             FormId: formId
         }
     })
+    if (formUser.status != 'NEW') {
+        return res.status(400).json({error: 'Can not submit a form not in new status'});
+    }
     try {
         const result = sequelize.transaction(async (t) => {
             await formUser.setTasks([], { transaction: t });
@@ -128,6 +131,9 @@ const approval = async (req, res) => {
             FormId: formId
         }
     })
+    if (!formUser){
+        return res.status(404).json({error: 'this form does not exist'});
+    }
     formUser.set({
         status: formSubmitStatus.APPROVAL,
         manager_comment
@@ -146,6 +152,9 @@ const reject = async (req, res) => {
             FormId: formId
         }
     })
+    if (!formUser){
+        return res.status(404).json({error: 'this form does not exist'});
+    }
     formUser.set({
         status: formSubmitStatus.NEW,
         manager_comment

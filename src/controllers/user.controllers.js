@@ -9,6 +9,7 @@ const { sequelize, User, Role } = require('../models');
 const { saltRounds } = require('../configs/hashPW.configs');
 const { Op } = require('sequelize');
 
+/** @type {import("express").RequestHandler} */
 const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({
@@ -262,7 +263,7 @@ const editPasswordUser = async (req, res) => {
     }
     const hashPassword = await bcrypt.hash(password, saltRounds);
     const user = await User.findByPk(userId);
-    user.password - hashPassword;
+    user.password = hashPassword;
     await user.save();
     res.json({ message: 'Password edited successfully' })
 }
