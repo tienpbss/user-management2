@@ -53,8 +53,8 @@ const editInfo = async (req, res) => {
     } = req.body;
 
     const emailExists = await checkEmailExist(email, user.id)
-    if (emailExists){
-        return res.status(400).json({ error: 'Email already exists'});
+    if (emailExists) {
+        return res.status(400).json({ error: 'Email already exists' });
     }
 
     user.set({
@@ -172,8 +172,8 @@ const addUser = async (req, res) => {
     }
 
     const emailExist = await checkEmailExist(email);
-    if (emailExist){
-        return res.status(400).json({ error: 'Email already exists'});
+    if (emailExist) {
+        return res.status(400).json({ error: 'Email already exists' });
     }
 
     // Ma nhan vien mac dinh la date.now don vi giay
@@ -230,8 +230,8 @@ const editUser = async (req, res) => {
     }
 
     const emailExists = await checkEmailExist(email, userId);
-    if (emailExists){
-        return res.status(400).json({ error: 'Email already exists'});
+    if (emailExists) {
+        return res.status(400).json({ error: 'Email already exists' });
     }
 
     await User.update({

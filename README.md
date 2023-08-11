@@ -17,20 +17,39 @@ MYSQL_DATABASE=YOUR_MYSQL_DATABASE
 EMAIL=YOUR_GMAIL
 MAIL_PASSWORD= app password create by gmail
 ```
-## Installation
+# Installation and running the app
+
+Install the dependencies:
 
 ```bash
-$ git clone
-$ cd user-management2
 $ npm install
 ```
 
-## Running the app
+Use the command below to generate the documentation at project startup:
+
+```bash
+$ npm run start-gendoc
+```
+
+Use the command below to start the project without generating the documentation:
+
+```bash
+$ npm start
+```
+
+Use the command below to run project with nodemon
 
 ```bash
 # In local development
 $ npm run dev
 ```
-## Database
+
+Run the project and access the documentation at:
+
+[http://localhost:3000/doc](http://localhost:3000/doc)
+
+
+
+# Database
 Create diagram on erd.dbdesigner.net don't have uuid type => use integer instead
 ![img of database](user-management_database.png)
