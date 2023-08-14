@@ -1,4 +1,5 @@
-const swaggerAutogen = require('swagger-autogen')()
+const swaggerAutogen = require('swagger-autogen')({openapi: '3.0.0'});
+
 
 const doc = {
     info: {
@@ -14,50 +15,73 @@ const doc = {
     tags: [
         {
             "name": "User",
-            "description": "Endpoints user"
-        },
-        {
-            "name": "Role",
-            "description": "Endpoints role"
-        },
-        {
-            "name": "Permission",
-            "description": "Endpoints permission"
-        },
-        {
-            "name": "Form",
-            "description": "Endpoints form"
-        },
-        {
-            "name": "FormSubmit",
-            "description": "Endpoints form-submit"
-        },
+            "description": "Endpoints"
+        }
     ],
-    securityDefinitions: {
-        api_key: {
-            type: "apiKey",
-            name: "api_key",
-            in: "header"
+    components: {
+        securitySchemes:{
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer'
+            }
         },
-        petstore_auth: {
-            type: "oauth2",
-            authorizationUrl: "https://petstore.swagger.io/oauth/authorize",
-            flow: "implicit",
-            scopes: {
-                read_pets: "read your pets",
-                write_pets: "modify pets in your account"
+        schemas: {
+            User: {
+                "$id": 1,
+                "$mnv": "1691659696",
+                "$avatar": null,
+                "$email": "json01@qa.team",
+                "$password": "$2b$10$HHRZlHNBsx04uUTnjNZuc.f6GiAFyt8N59vhG8h/mEd2idKz248gG",
+                "$firstName": "ruri",
+                "$lastName": "Ryu",
+                "$dob": "2001-01-01",
+                "$phone": "0123",
+                "$cmnd": "004",
+                "$bhxh": "003",
+                "$address": "Hanoi",
+                "$activate": true,
+            },
+            Role: {
+                $name: 'ADMIN',
+                description: 'admin of system'
+            },
+            Permission: {
+                $name: 'CREATE_ROLE',
+                description: 'admin of system'
+            },
+            Form: {
+                $FormCategoryId: 1,
+                $name: 'Form of work report in July',
+                $description: 'Progress of works in July',
+                $due_date: '2023-08-03',
+                $status: 'OPEN'
+            },
+            FormSubmit: {
+                $userId: 1,
+                $formId: 1,
+                userComment: 'Done',
+                managerComment: 'Ok',
+                $status: 'PENDING',
+                tasks: {
+                    $ref: '#/components/schemas/Task'
+                }
+            },
+            Task: {
+                $content: 'Create codebase',
+                $result: 'Done'
             }
         }
     },
-    definitions: {
-
-    }
+    security: [
+        {
+            "bearerAuth": []
+        }
+    ]
 }
 
 const outputFile = './swagger_output.json'
-const endpointsFiles = ['./server.js']
+const endpointsFiles = ['./src/server.js']
 
-swaggerAutogen(outputFile, endpointsFiles, doc)
-    .then(() => {
-        require('./server')
-    })
+swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
+    require('./server')           // Your project's root file
+})
