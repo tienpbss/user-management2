@@ -4,9 +4,15 @@ const { Op } = require("sequelize");
 
 const viewAllForms = async (req, res) => {
     const user = req.user;
-    const { status } = req.query;
+    const { page = 0, status } = req.query;
+    const elementPerPage = 10;
+    const pagination = {
+        limit: elementPerPage,
+        offset: page*elementPerPage
+    }
     const formSubmits = await user.getForms({
-        include: [{ model: FormCategory }]
+        include: [{ model: FormCategory }],
+        ...pagination
     });
     let forms = await formSubmits.map((e) => {
         return {
@@ -103,18 +109,24 @@ const getFormSubmit = async (req, res) => {
 }
 
 const getAllFormSubmits = async (req, res) => {
-    const { status } = req.query;
+    const { page = 0, status } = req.query;
+    const elementPerPage = 10;
+    const pagination = {
+        limit: elementPerPage,
+        offset: page*elementPerPage
+    }
     if (status && status != formSubmitStatus.PENDING && status != formSubmitStatus.APPROVAL) {
         res.status(400).json({ error: 'Status not allow' })
     }
     let filter = {
-        status: { [Op.or]: [formSubmitStatus.PENDING, formSubmitStatus.APPROVAL] },
+        status: { [Op.or]: [formSubmitStatus.NEW, formSubmitStatus.PENDING, formSubmitStatus.APPROVAL] },
     };
     if (status) {
         filter.status = status
     }
     const formUsers = await FormSubmit.findAll({
-        where: filter
+        where: filter,
+        ...pagination
     });
     res.json({
         message: "all form-submits of user",

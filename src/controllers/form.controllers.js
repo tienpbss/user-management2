@@ -52,7 +52,15 @@ const editInfoForm = async (req, res) => {
 }
 
 const getAllForms = async (req, res) => {
-    const forms = await Form.findAll();
+    const { page = 0 } = req.query;
+    const elementPerPage = 10;
+    const pagination = {
+        limit: elementPerPage,
+        offset: page*elementPerPage
+    }
+    const forms = await Form.findAll({
+        ...pagination
+    });
     res.json({
         forms
     })
@@ -120,7 +128,15 @@ const setUsers = async (req, res) => {
 
 const getUserOfForm = async (req, res) => {
     const formId = req.params.formId;
-    const form = await Form.findByPk(formId);
+    const { page = 0 } = req.query;
+    const elementPerPage = 10;
+    const pagination = {
+        limit: elementPerPage,
+        offset: page*elementPerPage
+    }
+    const form = await Form.findByPk(formId,{
+        ...pagination
+    });
     if (!form) {
         return res.status(404).json({ error: 'Form not found' });
     }

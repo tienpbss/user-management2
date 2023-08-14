@@ -1,8 +1,15 @@
 const { Role, Permission } = require('../models');
 
 const getAllRoles = async (req, res) => {
+    const { page = 0 } = req.query;
+    const elementPerPage = 10;
+    const pagination = {
+        limit: elementPerPage,
+        offset: page*elementPerPage
+    }
     const roles = await Role.findAll({
-        attributes: ['id', 'name']
+        attributes: ['id', 'name'],
+        ...pagination
     });
     res.json({
         message: 'Get roles successful',

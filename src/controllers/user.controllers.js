@@ -134,7 +134,15 @@ const getAvatarUser = async (req, res) => {
 }
 
 const getAllUsers = async (req, res) => {
-    const users = await User.findAll();
+    const { page = 0 } = req.query;
+    const elementPerPage = 10;
+    const pagination = {
+        limit: elementPerPage,
+        offset: page*elementPerPage
+    }
+    const users = await User.findAll({
+        ...pagination
+    });
     res.json({
         users
     })
