@@ -89,6 +89,5 @@ router.get('/report/:formId', auth.isLogged, auth.checkPermission(CREATE_FORM), 
 	 * */
 );
 
-//co the cai thien code nay bang cach su dung app.user('forms') o server. xem lai cai nay
 
 module.exports = router;
